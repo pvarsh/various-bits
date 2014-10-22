@@ -236,3 +236,15 @@ WHERE sailorsailor.sid IS NULL
 SELECT s.sname, s.age
 FROM sailors s
 WHERE s.age = (SELECT MAX(s.age) from sailors s);
+
+/* Not using max() */
+SELECT s2.sname, s2.age
+FROM
+	(SELECT s2.sid, s2.age, s2.sname
+		FROM sailors s2
+		CROSS JOIN sailors s
+		WHERE s.sid <> s2.sid AND s2.age < s.age
+	) AS sailorsailor
+RIGHT JOIN sailors s2 ON s2.sid = sailorsailor.sid
+WHERE sailorsailor.sid IS NULL
+;
