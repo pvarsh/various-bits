@@ -142,4 +142,17 @@ SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE
 
 SELECT s.sid FROM sailors s WHERE s.rating > @bobmin;
 
-/*------ 9. 
+/*------ 9. Find the IDs of sailors whose rating is better than every sailor called Bob ------*/
+SET @bobmax = (SELECT MAX(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob');
+
+SELECT s.sid FROM sailors s WHERE s.rating > @bobmax;
+
+/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid, s.rating, s.sname
+FROM sailors s
+WHERE s.rating = (SELECT MAX(s.rating) from sailors s);
+
+/*------ 11. Find the name and age of the oldest sailor ------*/
+SELECT s.sname, s.age
+FROM sailors s
+WHERE s.age = (SELECT MAX(s.age) from sailors s);

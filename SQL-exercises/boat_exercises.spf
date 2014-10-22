@@ -210,8 +210,20 @@ SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE
 
 SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin;
 
-/*------ 9. 
-</string>
+/*------ 9. Find the IDs of sailors whose rating is better than every sailor called Bob ------*/
+SET @bobmax = (SELECT MAX(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob');
+
+SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmax;
+
+/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid, s.rating, s.sname
+FROM sailors s
+WHERE s.rating = (SELECT MAX(s.rating) from sailors s);
+
+/*------ 11. Find the name and age of the oldest sailor ------*/
+SELECT s.sname, s.age
+FROM sailors s
+WHERE s.age = (SELECT MAX(s.age) from sailors s);</string>
 			<key>table</key>
 			<string>sailors</string>
 			<key>view</key>
@@ -228,6 +240,33 @@ SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin;
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>/*------ 11. Find the name and age of the oldest sailor ------*/
+SELECT s.sname, s.age
+FROM sailors s
+WHERE s.age = (SELECT MAX(s.age) from sailors s)</string>
+		<string>/*------ 11. Find the name and age of the oldest sailor ------*/
+SELECT s.name, s.age
+FROM sailors s
+WHERE s.age = (SELECT MAX(s.age) from sailors s)</string>
+		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid, s.rating, s.sname
+FROM sailors s
+WHERE s.rating = (SELECT MAX(s.rating) from sailors s)</string>
+		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid
+FROM sailors s
+WHERE s.rating = (SELECT MAX(s.rating) from sailors s)</string>
+		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid
+FROM sailors s
+WHERE s.rating = SELECT MAX(s.rating) from sailors s</string>
+		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
+SELECT s.sid
+FROM sailors s
+WHERE s.rating = MAX(s.rating)</string>
+		<string>SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmax</string>
+		<string>/*------ 9. Find the IDs of sailors whose rating is better than every sailor called Bob ------*/
+SET @bobmax = (SELECT MAX(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
 		<string>SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin</string>
 		<string>SELECT s.sid, s.sname, s.rating FROM sailors s WHERE s.rating &gt; @bobmin</string>
 		<string>SELECT s.sid, s.sname FROM sailors s WHERE s.rating &gt; @bobmin</string>
@@ -253,42 +292,6 @@ SELECT * FROM
 	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
 	GROUP BY s.sid) scounts
 WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake")</string>
-		<string>SELECT s.sname, COUNT(b.bid)
-FROM sailors s JOIN reserves r ON s.sid = r.sid
-JOIN boats b ON r.bid = b.bid
-WHERE b.bname LIKE 'interlake'</string>
-		<string>SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake")</string>
-		<string>SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake"</string>
-		<string>SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake"</string>
-		<string>SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = 2</string>
-		<string>SELECT COUNT(DISTINCT bid) FROM boats WHERE bname LIKE "interlake"</string>
-		<string>SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = (SELECT COUNT(DISTINCT bid) FROM boats WHERE bname LIKE "interlake") aaa</string>
-		<string>SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = SELECT COUNT(DISTINCT bid) FROM boats WHERE bname LIKE "interlake"</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
