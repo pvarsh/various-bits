@@ -41,6 +41,8 @@
 		<dict>
 			<key>connectionEncoding</key>
 			<string>latin1</string>
+			<key>contentFilter</key>
+			<dict/>
 			<key>contentPageNumber</key>
 			<integer>1</integer>
 			<key>contentSelection</key>
@@ -130,9 +132,29 @@ FROM sailors s JOIN (
 ;
 
 /* Natural join of all three tables by IDs. */
-SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid;</string>
+SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid;
+
+/*------ 4. Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid, s.age
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+) AND s.age &gt; 20
+ORDER BY s.sname;
+
+/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
+JOIN sailors s ON s.sid = r1.sid
+WHERE r1.bid &lt; r2.bid
+GROUP BY s.sid
+;
+
+/*------ 6. Find the names of sailors who have reserved all boats ------*/
+</string>
 			<key>table</key>
-			<string>reserves</string>
+			<string>sailors</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
@@ -147,6 +169,103 @@ SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.b
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
+JOIN sailors s ON s.sid = r1.sid
+WHERE r1.bid &lt; r2.bid
+GROUP BY s.sid</string>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
+JOIN sailors s ON s.sid = r1.sid
+WHERE r1.bid &lt; r2.bid</string>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
+JOIN sailros s ON s.sid = r1.sid
+WHERE r1.bid &lt; r2.bid</string>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid) r3
+JOIN sailros s ON s.sid = r3.sid
+WHERE r1.bid &lt; r2.bid</string>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boatsn ------*/
+SELECT *
+FROM reserves r1 JOIN reserves r2 ON r1.sid = r2.sid
+WHERE r1.bid &lt; r2.bid</string>
+		<string>/*------ 5. Find the names of sailors who have reserved at least two boatsn ------*/
+SELECT *
+FROM reserves r1 JOIN reserves r2 ON r1.sid = r2.sid</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid, s.age
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+) AND s.age &gt; 20
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid, s.age
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+HAVING age &gt; 20
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+HAVING s.age &gt; 20
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+HAVING s.age &gt; 20
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+WHERE s.age &gt; 20
+ORDER BY s.sname</string>
+		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid
+FROM s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+WHERE s.age &gt; 20
+ORDER BY sname</string>
 		<string>/* Correct answer */
 SELECT sname, sid
 FROM sailors
@@ -177,66 +296,6 @@ WHERE sid NOT IN (SELECT sid
 	WHERE b.color LIKE 'red'
 )</string>
 		<string>SELECT sname FROM sailors WHERE sid NOT IN (22, 31, 64)</string>
-		<string>/* Reserves of non-red boats */
-SELECT sid
-FROM reserves r JOIN boats b ON r.bid = b.bid
-WHERE b.color LIKE 'red'</string>
-		<string>SELECT sname FROM sailors WHERE sid NOT IN (22, 31, 64, 74)</string>
-		<string>SELECT sname FROM sailors WHERE sid IN (22, 31, 64, 74)</string>
-		<string>SELECT sname FROM sailors WHERE sid EXISTS (22, 31, 64, 74)</string>
-		<string>SELECT sname FROM sailors WHERE sid IN [22, 31, 64, 74]</string>
-		<string>/* Reserves of non-red boats */
-SELECT sid
-FROM reserves r JOIN boats b ON r.bid = b.bid
-WHERE b.color &lt;&gt; 'red'</string>
-		<string>/* Reserves of non-red boats */
-SELECT sid, sname
-FROM reserves r JOIN boats b ON r.bid = b.bid
-WHERE b.color &lt;&gt; 'red'</string>
-		<string>/*----- 3. Find the names of sailors who have not reserved a red boat ------- */
-/* Sailors who did not rent any boats */
-SELECT s.sname
-FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
-WHERE r.bid IS NULL</string>
-		<string>/* Sailors who did not rent a red boat (including those who did not rent at all) */
-SELECT s.sname
-FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
-WHERE r.bid IS NULL
-UNION
-SELECT s.sname
-FROM sailors s JOIN (
-	SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color &lt;&gt; 'red'
-	)nonreds
-	ON s.sid = nonreds.sid</string>
-		<string>SELECT * FROM sailors s, reserves r, boats b</string>
-		<string>SELECT * FROM sailors, reserves, boats</string>
-		<string>/* Sailors who did not rent a red boat (including those who did not rent at all) */
-SELECT s.sname
-FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
-WHERE r.bid IS NULL
-UNION
-SELECT s.sname
-FROM sailors s JOIN (
-	SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color &lt;&gt; 'red'
-	)nonreds
-	ON s.sid = nonreds.sid
-ORDER BY s.sname</string>
-		<string>/* Sailors who reserved non-red boats */
-SELECT s.sname
-FROM sailors s JOIN (
-	SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color &lt;&gt; 'red'
-	)nonreds
-	ON s.sid = nonreds.sid</string>
-		<string>/* Reserves of non-red boats */
-SELECT *
-FROM reserves r JOIN boats b ON r.bid = b.bid
-WHERE b.color &lt;&gt; 'red'</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>

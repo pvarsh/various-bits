@@ -65,3 +65,22 @@ FROM sailors s JOIN (
 
 /* Natural join of all three tables by IDs. */
 SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid;
+
+/*------ 4. Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
+SELECT s.sname, s.sid, s.age
+FROM sailors s
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+) AND s.age > 20
+ORDER BY s.sname;
+
+/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
+SELECT s.sname
+FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
+JOIN sailors s ON s.sid = r1.sid
+WHERE r1.bid < r2.bid
+GROUP BY s.sid
+;
+
+/*------ 6. Find the names of sailors who have reserved all boats ------*/
