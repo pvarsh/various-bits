@@ -119,6 +119,74 @@ FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
 WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)
 ;
 
+/* Using division */
+SELECT DISTINCT sname
+FROM  
+	(SELECT DISTINCT sat_sidbid.sid FROM
+		(SELECT DISTINCT sidbid.sid, bids.bid FROM 
+			(SELECT s.sid, r.bid
+				FROM sailors s JOIN reserves r ON s.sid = r.sid
+			) AS sidbid
+		CROSS JOIN
+			(SELECT b.bid
+				FROM boats b
+			) AS bids
+		) AS sat_sidbid /* saturated sailor id cross boat id */
+	LEFT JOIN
+		(SELECT s1.sid, r1.bid
+			FROM sailors s1
+			JOIN reserves r1 ON s1.sid = r1.sid
+		) AS qwerty
+		ON qwerty.sid = sat_sidbid.sid AND qwerty.bid = sat_sidbid.bid
+		WHERE qwerty.sid IS NULL
+	) as poiu
+	RIGHT JOIN
+	(SELECT s3.sid, s3.sname
+		FROM sailors s3
+		JOIN reserves r3 ON s3.sid = r3.sid
+	) as asdf
+	ON poiu.sid = asdf.sid WHERE poiu.sid IS NULL
+;
+
+SELECT DISTINCT sat_sidbid.sid FROM
+		(SELECT DISTINCT sidbid.sid, bids.bid FROM 
+			(SELECT s.sid, r.bid
+				FROM sailors s JOIN reserves r ON s.sid = r.sid
+			) AS sidbid
+		CROSS JOIN
+			(SELECT b.bid
+				FROM boats b
+			) AS bids
+		) AS sat_sidbid /* saturated sailor id cross boat id */
+	LEFT JOIN
+		(SELECT s1.sid, r1.bid
+			FROM sailors s1
+			JOIN reserves r1 ON s1.sid = r1.sid
+		) AS qwerty
+		ON qwerty.sid = sat_sidbid.sid AND qwerty.bid = sat_sidbid.bid
+		WHERE qwerty.sid IS NULL;
+
+SELECT DISTINCT sidbid.sid, bids.bid FROM 
+		(SELECT s.sid, r.bid
+			FROM sailors s JOIN reserves r ON s.sid = r.sid
+		) AS sidbid
+		LEFT JOIN
+		(SELECT b.bid
+			FROM boats b
+		) AS bids
+		ON bids.bid = sidbid.bid
+;
+
+
+
+
+
+SELECT s.sid
+FROM sailors s
+JOIN reserves r ON s.sid = r.sid
+CROSS boats b
+
+
 /*------ 7. Find the names of sailors who have reserved all boats called Interlake ------ */
 /* Idea: select sailors whose count of boats named "Interlake" is the same as the total count of boats named "Interlake" */
 
@@ -151,6 +219,18 @@ SELECT s.sid FROM sailors s WHERE s.rating > @bobmax;
 SELECT s.sid, s.rating, s.sname
 FROM sailors s
 WHERE s.rating = (SELECT MAX(s.rating) from sailors s);
+
+/* Not using max() */
+SELECT s1.sid, s1.sname
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid <> s1.sid AND s2.rating > s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid
+WHERE sailorsailor.sid IS NULL
+;
 
 /*------ 11. Find the name and age of the oldest sailor ------*/
 SELECT s.sname, s.age

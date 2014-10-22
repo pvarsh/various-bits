@@ -187,6 +187,74 @@ FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
 WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)
 ;
 
+/* Using division */
+SELECT DISTINCT sname
+FROM  
+	(SELECT DISTINCT sat_sidbid.sid FROM
+		(SELECT DISTINCT sidbid.sid, bids.bid FROM 
+			(SELECT s.sid, r.bid
+				FROM sailors s JOIN reserves r ON s.sid = r.sid
+			) AS sidbid
+		CROSS JOIN
+			(SELECT b.bid
+				FROM boats b
+			) AS bids
+		) AS sat_sidbid /* saturated sailor id cross boat id */
+	LEFT JOIN
+		(SELECT s1.sid, r1.bid
+			FROM sailors s1
+			JOIN reserves r1 ON s1.sid = r1.sid
+		) AS qwerty
+		ON qwerty.sid = sat_sidbid.sid AND qwerty.bid = sat_sidbid.bid
+		WHERE qwerty.sid IS NULL
+	) as poiu
+	RIGHT JOIN
+	(SELECT s3.sid, s3.sname
+		FROM sailors s3
+		JOIN reserves r3 ON s3.sid = r3.sid
+	) as asdf
+	ON poiu.sid = asdf.sid WHERE poiu.sid IS NULL
+;
+
+SELECT DISTINCT sat_sidbid.sid FROM
+		(SELECT DISTINCT sidbid.sid, bids.bid FROM 
+			(SELECT s.sid, r.bid
+				FROM sailors s JOIN reserves r ON s.sid = r.sid
+			) AS sidbid
+		CROSS JOIN
+			(SELECT b.bid
+				FROM boats b
+			) AS bids
+		) AS sat_sidbid /* saturated sailor id cross boat id */
+	LEFT JOIN
+		(SELECT s1.sid, r1.bid
+			FROM sailors s1
+			JOIN reserves r1 ON s1.sid = r1.sid
+		) AS qwerty
+		ON qwerty.sid = sat_sidbid.sid AND qwerty.bid = sat_sidbid.bid
+		WHERE qwerty.sid IS NULL;
+
+SELECT DISTINCT sidbid.sid, bids.bid FROM 
+		(SELECT s.sid, r.bid
+			FROM sailors s JOIN reserves r ON s.sid = r.sid
+		) AS sidbid
+		LEFT JOIN
+		(SELECT b.bid
+			FROM boats b
+		) AS bids
+		ON bids.bid = sidbid.bid
+;
+
+
+
+
+
+SELECT s.sid
+FROM sailors s
+JOIN reserves r ON s.sid = r.sid
+CROSS boats b
+
+
 /*------ 7. Find the names of sailors who have reserved all boats called Interlake ------ */
 /* Idea: select sailors whose count of boats named "Interlake" is the same as the total count of boats named "Interlake" */
 
@@ -220,6 +288,18 @@ SELECT s.sid, s.rating, s.sname
 FROM sailors s
 WHERE s.rating = (SELECT MAX(s.rating) from sailors s);
 
+/* Not using max() */
+SELECT s1.sid, s1.sname
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid
+WHERE sailorsailor.sid IS NULL
+;
+
 /*------ 11. Find the name and age of the oldest sailor ------*/
 SELECT s.sname, s.age
 FROM sailors s
@@ -240,58 +320,103 @@ WHERE s.age = (SELECT MAX(s.age) from sailors s);</string>
 	<array/>
 	<key>queryHistory</key>
 	<array>
-		<string>/*------ 11. Find the name and age of the oldest sailor ------*/
-SELECT s.sname, s.age
-FROM sailors s
-WHERE s.age = (SELECT MAX(s.age) from sailors s)</string>
-		<string>/*------ 11. Find the name and age of the oldest sailor ------*/
-SELECT s.name, s.age
-FROM sailors s
-WHERE s.age = (SELECT MAX(s.age) from sailors s)</string>
-		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
-SELECT s.sid, s.rating, s.sname
-FROM sailors s
-WHERE s.rating = (SELECT MAX(s.rating) from sailors s)</string>
-		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
-SELECT s.sid
-FROM sailors s
-WHERE s.rating = (SELECT MAX(s.rating) from sailors s)</string>
-		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
-SELECT s.sid
-FROM sailors s
-WHERE s.rating = SELECT MAX(s.rating) from sailors s</string>
-		<string>/*------ 10. Find the IDs of sailors with the highest rating ------*/
-SELECT s.sid
-FROM sailors s
-WHERE s.rating = MAX(s.rating)</string>
-		<string>SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmax</string>
-		<string>/*------ 9. Find the IDs of sailors whose rating is better than every sailor called Bob ------*/
-SET @bobmax = (SELECT MAX(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
-		<string>SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin</string>
-		<string>SELECT s.sid, s.sname, s.rating FROM sailors s WHERE s.rating &gt; @bobmin</string>
-		<string>SELECT s.sid, s.sname FROM sailors s WHERE s.rating &gt; @bobmin</string>
-		<string>SELECT @bobmin</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SET @bobmin = (SELECT s.sname, MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SELECT s.sname, MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob'</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SELECT s.sname, MIN(s.rating) mrating FROM sailors s WHERE s.sname LIKE 'bob'</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SELECT s.sname, MIN(s.rating) FROM sailors s WHERE s.sname LIKE 'bob'</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SELECT s.sname, s.rating FROM sailors s WHERE s.sname LIKE 'bob'</string>
-		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
-SELECT s.sname, s.rating FROM sailors WHERE s.sname LIKE 'bob'</string>
-		<string>/* Answer */
-SELECT * FROM 
-	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-	FROM sailors s, reserves r, boats b
-	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-	GROUP BY s.sid) scounts
-WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake")</string>
+		<string>/* Not using max() */
+SELECT s1.sid, s1.sname
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid
+WHERE sailorsailor.sid IS NULL</string>
+		<string>/* Not using max() */
+SELECT s1.sid
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid
+WHERE sailorsailor.sid IS NULL</string>
+		<string>/* Not using max() */
+SELECT *
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid</string>
+		<string>/* Not using max() */
+SELECT s1.sid
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailorsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid</string>
+		<string>SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating</string>
+		<string>/* Not using max() */
+SELECT s1.sid
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailrsailor
+RIGHT JOIN sailors s1 ON s1.sid = sailorsailor.sid</string>
+		<string>/* Not using max() */
+SELECT s1.sid
+FROM (SELECT DISTINCT s1.sid
+		FROM sailors s1
+		CROSS JOIN
+		sailors s2
+		WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating
+     ) AS sailrsailor
+RIGHT JOIN sailor s1 ON s1.sid = sailorsailor.sid</string>
+		<string>/* Not using max() */
+SELECT * FROM (SELECT DISTINCT s1.sid
+FROM sailors s1
+CROSS JOIN
+sailors s2
+WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating) sailrsailor</string>
+		<string>/* Not using max() */
+SELECT * FROM (SELECT s1.sid
+FROM sailors s1
+CROSS JOIN
+sailors s2
+WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating) sailrsailor</string>
+		<string>/* Not using max() */
+SELECT * FROM sailor s1 (SELECT s1.sid
+FROM sailors s1
+CROSS JOIN
+sailors s2
+WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating) sailrsailor</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1 CROSS JOIN sailors s2 WHERE s2.sid &lt;&gt; s1.sid AND s2.rating &gt; s1.rating</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1 CROSS JOIN sailors s2</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1 CROSS JOIN sailors s2 WHERE s2.sid &lt;&gt; s1.sid</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1 OUTER JOIN sailors s2</string>
+		<string>CROSS JOIN</string>
+		<string>JOIN</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1  CROSS sailors s2</string>
+		<string>/* Not using max() */
+SELECT * FROM sailors s1 OUTER CROSS sailors s2</string>
+		<string>/* Not using max() */
+SELECT * FROM sailor s1 CROSS JOIN sailor s2</string>
+		<string>/* Not using max() */
+SELECT * FROM sailor s1 OUTER CROSS sailor s2</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
