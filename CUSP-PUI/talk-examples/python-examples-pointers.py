@@ -5,7 +5,7 @@ import copy
 ######################################################
 
 ######################################################
-#### Everything is a pointer
+##### Everything is a pointer
 #y = [1,2,3]
 #x = y
 #x[2] = 0
@@ -27,13 +27,13 @@ import copy
 
 ######################################################
 #### However this will still run into trouble if
-#### your list contains pointers.
+##### your list contains pointers.
 #z = [1,2]
 #y = [1,2,3, z]
 #x = [item for item in y]
 #print "Using comprehension to copy can fail too: "
 #print "x before changing z: ", x
-#z[1] = "Dead Parrot"
+#x[3][1] = "Dead Parrot"
 #print "x after changing z: ", x
 ######################################################
 

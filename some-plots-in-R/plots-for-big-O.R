@@ -37,4 +37,4 @@ bigOplots = function(nmax){
          cex = 0.8)
 }
 
-bigOplots(5)
+bigOplots(1e6)

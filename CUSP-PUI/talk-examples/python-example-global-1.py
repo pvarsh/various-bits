@@ -2,7 +2,7 @@
 
 def fun1():
     print "now we assigned 40 to x"
-    x = 40
+    global x = 40
 
 x = 42
 print "x before running fun1():", x
