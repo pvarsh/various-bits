@@ -5,10 +5,63 @@ FROM boats s, reserves b, sailors r
 WHERE s.bid = b.bid AND r.sid = b.sid AND r.sname LIKE 'Lubber';
 
 /*----- 2. Find all IDs of sailors who have a rating of at least 8 or have reserved boat 103 -------*/
-SELECT DISTINCT *
+/* Incorrect */
+SELECT DISTINCT s.sid
 FROM sailors s, reserves r
 WHERE s.sid = r.sid AND (s.rating >= 8 OR r.bid = 103);
 
-SELECT DISTINCT *
+/* Correct with LEFT JOIN */
+SELECT DISTINCT s.sid
 FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
-WHERE s.rating >= 8 OR r.bid = 103;
+WHERE s.rating >= 8 OR r.bid = 103 ORDER BY s.sid;
+
+/* Correct with UNION */
+(SELECT sid
+	FROM sailors s
+	WHERE s.rating >= 8)
+UNION (
+	SELECT s.sid
+	FROM sailors s, reserves r
+	WHERE s.sid = r.sid AND r.bid = 103
+	)
+ORDER BY sid;
+
+/*----- Extra question: Find the names of sailors who have not reserved a boat ------- */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+;
+
+/*----- 3. Find the names of sailors who have not reserved a red boat ------- */
+/* Sailors who did not rent any boats */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+;
+/* Reserves of non-red boats */
+SELECT sid
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color LIKE 'red'
+;
+
+/* Correct answer */
+SELECT sname, sid
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY sname;
+
+/* Sailors who reserved non-red boats */
+SELECT s.sname
+FROM sailors s JOIN (
+	SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color <> 'red'
+	)nonreds
+	ON s.sid = nonreds.sid
+;
+
+/* Natural join of all three tables by IDs. */
+SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid;

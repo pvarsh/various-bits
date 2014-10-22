@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>boats</string>
+			<key>host</key>
+			<string>localhost</string>
+			<key>name</key>
+			<string>boats</string>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPSocketConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>root</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>latin1</string>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSelection</key>
+			<data>
+			YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJX
+			TlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAF
+			gAdUdHlwZVRyb3dzXxAdU2VsZWN0aW9uRGV0YWlsVHlwZU5TSW5k
+			ZXhTZXTSFwsYGVxOU1JhbmdlQ291bnQQAIAG0hscHR5aJGNsYXNz
+			bmFtZVgkY2xhc3Nlc1pOU0luZGV4U2V0oh8gWk5TSW5kZXhTZXRY
+			TlNPYmplY3TSGxwiI1xOU0RpY3Rpb25hcnmiIiBfEA9OU0tleWVk
+			QXJjaGl2ZXLRJidUZGF0YYABAAgAEQAaACMALQAyADcAQABGAE0A
+			VQBgAGcAagBsAG4AcQBzAHUAdwB8AIEAoQCmALMAtQC3ALwAxwDQ
+			ANsA3gDpAPIA9wEEAQcBGQEcASEAAAAAAAACAQAAAAAAAAAoAAAA
+			AAAAAAAAAAAAAAABIw==
+			</data>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 0}, {745, 481}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>
+/*----- 1. Find the colors of boats reserved by Lubber. ----- */
+SELECT DISTINCT color
+FROM boats s, reserves b, sailors r
+WHERE s.bid = b.bid AND r.sid = b.sid AND r.sname LIKE 'Lubber';
+
+/*----- 2. Find all IDs of sailors who have a rating of at least 8 or have reserved boat 103 -------*/
+/* Incorrect */
+SELECT DISTINCT s.sid
+FROM sailors s, reserves r
+WHERE s.sid = r.sid AND (s.rating &gt;= 8 OR r.bid = 103);
+
+/* Correct with LEFT JOIN */
+SELECT DISTINCT s.sid
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE s.rating &gt;= 8 OR r.bid = 103 ORDER BY s.sid;
+
+/* Correct with UNION */
+(SELECT sid
+	FROM sailors s
+	WHERE s.rating &gt;= 8)
+UNION (
+	SELECT s.sid
+	FROM sailors s, reserves r
+	WHERE s.sid = r.sid AND r.bid = 103
+	)
+ORDER BY sid;
+
+/*----- Extra question: Find the names of sailors who have not reserved a boat ------- */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+;
+
+/*----- 3. Find the names of sailors who have not reserved a red boat ------- */
+/* Sailors who did not rent any boats */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+;
+/* Reserves of non-red boats */
+SELECT sid
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color LIKE 'red'
+;
+
+/* Correct answer */
+SELECT sname, sid
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY sname;
+
+/* Sailors who reserved non-red boats */
+SELECT s.sname
+FROM sailors s JOIN (
+	SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color &lt;&gt; 'red'
+	)nonreds
+	ON s.sid = nonreds.sid
+;
+
+/* Natural join of all three tables by IDs. */
+SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid;</string>
+			<key>table</key>
+			<string>reserves</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>202</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>/* Correct answer */
+SELECT sname, sid
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY sname</string>
+		<string>SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid</string>
+		<string>SELECT sname, sid
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY sname</string>
+		<string>SELECT sname
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)
+ORDER BY sname</string>
+		<string>SELECT sname
+FROM sailors
+WHERE sid NOT IN (SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color LIKE 'red'
+)</string>
+		<string>SELECT sname FROM sailors WHERE sid NOT IN (22, 31, 64)</string>
+		<string>/* Reserves of non-red boats */
+SELECT sid
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color LIKE 'red'</string>
+		<string>SELECT sname FROM sailors WHERE sid NOT IN (22, 31, 64, 74)</string>
+		<string>SELECT sname FROM sailors WHERE sid IN (22, 31, 64, 74)</string>
+		<string>SELECT sname FROM sailors WHERE sid EXISTS (22, 31, 64, 74)</string>
+		<string>SELECT sname FROM sailors WHERE sid IN [22, 31, 64, 74]</string>
+		<string>/* Reserves of non-red boats */
+SELECT sid
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color &lt;&gt; 'red'</string>
+		<string>/* Reserves of non-red boats */
+SELECT sid, sname
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color &lt;&gt; 'red'</string>
+		<string>/*----- 3. Find the names of sailors who have not reserved a red boat ------- */
+/* Sailors who did not rent any boats */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL</string>
+		<string>/* Sailors who did not rent a red boat (including those who did not rent at all) */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+UNION
+SELECT s.sname
+FROM sailors s JOIN (
+	SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color &lt;&gt; 'red'
+	)nonreds
+	ON s.sid = nonreds.sid</string>
+		<string>SELECT * FROM sailors s, reserves r, boats b</string>
+		<string>SELECT * FROM sailors, reserves, boats</string>
+		<string>/* Sailors who did not rent a red boat (including those who did not rent at all) */
+SELECT s.sname
+FROM sailors s LEFT JOIN reserves r ON s.sid = r.sid
+WHERE r.bid IS NULL
+UNION
+SELECT s.sname
+FROM sailors s JOIN (
+	SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color &lt;&gt; 'red'
+	)nonreds
+	ON s.sid = nonreds.sid
+ORDER BY s.sname</string>
+		<string>/* Sailors who reserved non-red boats */
+SELECT s.sname
+FROM sailors s JOIN (
+	SELECT sid
+	FROM reserves r JOIN boats b ON r.bid = b.bid
+	WHERE b.color &lt;&gt; 'red'
+	)nonreds
+	ON s.sid = nonreds.sid</string>
+		<string>/* Reserves of non-red boats */
+SELECT *
+FROM reserves r JOIN boats b ON r.bid = b.bid
+WHERE b.color &lt;&gt; 'red'</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.6.21</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>
