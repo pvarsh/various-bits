@@ -84,3 +84,39 @@ GROUP BY s.sid
 ;
 
 /*------ 6. Find the names of sailors who have reserved all boats ------*/
+SELECT * FROM boats;
+SELECT COUNT(bid) FROM boats UNION boats;
+
+/* Count counts duplicates */
+SELECT COUNT(bid) FROM
+(SELECT * FROM boats
+UNION ALL
+SELECT * FROM boats) bb
+;
+
+/* List boats a sailor reserved */
+SELECT s.sid, r.bid
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+;
+/* Count distinct boats a sailor reserved */
+SELECT s.sid, COUNT(DISTINCT r.bid)
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+GROUP BY s.sid;
+
+/* Insert another reserve for lubber for boat 102 which lubber had already reserved another day */
+INSERT INTO reserves (sid, bid, day) VALUES(31, 102, "2004-11-11");
+INSERT INTO reserves (sid, bid, day) VALUES(31, 101, "2004-11-11");
+/* Delete inserted reserve */
+DELETE FROM reserves WHERE bid = 102 AND sid = 31 AND day = "2004-11-11";
+DELETE FROM reserves WHERE bid = 101 AND sid = 31 AND day = "2004-11-11";
+
+/* Answer */
+SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)
+;
+
+/*------ 7. Find the names of sailors who have reserved all boats called BigBoat ------ */

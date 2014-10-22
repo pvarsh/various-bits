@@ -152,9 +152,44 @@ GROUP BY s.sid
 ;
 
 /*------ 6. Find the names of sailors who have reserved all boats ------*/
-</string>
+SELECT * FROM boats;
+SELECT COUNT(bid) FROM boats UNION boats;
+
+/* Count counts duplicates */
+SELECT COUNT(bid) FROM
+(SELECT * FROM boats
+UNION ALL
+SELECT * FROM boats) bb
+;
+
+/* List boats a sailor reserved */
+SELECT s.sid, r.bid
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+;
+/* Count distinct boats a sailor reserved */
+SELECT s.sid, COUNT(DISTINCT r.bid)
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+GROUP BY s.sid;
+
+/* Insert another reserve for lubber for boat 102 which lubber had already reserved another day */
+INSERT INTO reserves (sid, bid, day) VALUES(31, 102, "2004-11-11");
+INSERT INTO reserves (sid, bid, day) VALUES(31, 101, "2004-11-11");
+/* Delete inserted reserve */
+DELETE FROM reserves WHERE bid = 102 AND sid = 31 AND day = "2004-11-11";
+DELETE FROM reserves WHERE bid = 101 AND sid = 31 AND day = "2004-11-11";
+
+/* Answer */
+SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)
+;
+
+/*------ 7. Find the names of sailors who have reserved all boats called BigBoat ------ */</string>
 			<key>table</key>
-			<string>sailors</string>
+			<string>reserves</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
@@ -169,133 +204,72 @@ GROUP BY s.sid
 	<array/>
 	<key>queryHistory</key>
 	<array>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
-SELECT s.sname
-FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
-JOIN sailors s ON s.sid = r1.sid
-WHERE r1.bid &lt; r2.bid
+		<string>SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)</string>
+		<string>DELETE FROM reserves WHERE bid = 101 AND sid = 31 AND day = "2004-11-11"</string>
+		<string>INSERT INTO reserves (sid, bid, day) VALUES(31, 101, "2004-11-11")</string>
+		<string>/* List boats a sailor reserved */
+SELECT s.sid, r.bid
+FROM sailors s JOIN reserves r ON s.sid = r.sid</string>
+		<string>/* Count distinct boats a sailor reserved */
+SELECT s.sid, COUNT(DISTINCT r.bid)
+FROM sailors s JOIN reserves r ON s.sid = r.sid
 GROUP BY s.sid</string>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
-SELECT s.sname
-FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
-JOIN sailors s ON s.sid = r1.sid
-WHERE r1.bid &lt; r2.bid</string>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
-SELECT s.sname
-FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid)
-JOIN sailros s ON s.sid = r1.sid
-WHERE r1.bid &lt; r2.bid</string>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boats ------*/
-SELECT s.sname
-FROM (reserves r1 JOIN reserves r2 ON r1.sid = r2.sid) r3
-JOIN sailros s ON s.sid = r3.sid
-WHERE r1.bid &lt; r2.bid</string>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boatsn ------*/
-SELECT *
-FROM reserves r1 JOIN reserves r2 ON r1.sid = r2.sid
-WHERE r1.bid &lt; r2.bid</string>
-		<string>/*------ 5. Find the names of sailors who have reserved at least two boatsn ------*/
-SELECT *
-FROM reserves r1 JOIN reserves r2 ON r1.sid = r2.sid</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid, s.age
-FROM sailors s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-) AND s.age &gt; 20
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid, s.age
-FROM sailors s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM sailors s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM sailors s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-HAVING age &gt; 20
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM sailors s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-HAVING s.age &gt; 20
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-HAVING s.age &gt; 20
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-WHERE s.age &gt; 20
-ORDER BY s.sname</string>
-		<string>/*------- Find the IDs of sailors with age over 20 who have not reserved a red boat ---- */
-SELECT s.sname, s.sid
-FROM s
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-WHERE s.age &gt; 20
-ORDER BY sname</string>
-		<string>/* Correct answer */
-SELECT sname, sid
-FROM sailors
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-ORDER BY sname</string>
-		<string>SELECT * FROM sailors s, reserves r, boats b WHERE s.sid = r.sid AND b.bid = r.bid</string>
-		<string>SELECT sname, sid
-FROM sailors
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-ORDER BY sname</string>
-		<string>SELECT sname
-FROM sailors
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)
-ORDER BY sname</string>
-		<string>SELECT sname
-FROM sailors
-WHERE sid NOT IN (SELECT sid
-	FROM reserves r JOIN boats b ON r.bid = b.bid
-	WHERE b.color LIKE 'red'
-)</string>
-		<string>SELECT sname FROM sailors WHERE sid NOT IN (22, 31, 64)</string>
+		<string>SELECT COUNT(b.bid) FROM boats b</string>
+		<string>SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = SELECT COUNT(b.bid) as numboats FROM boats b</string>
+		<string>SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = SELECT COUNT(b.bid) FROM boats b as numboats</string>
+		<string>SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid
+WHERE sr.cnt = SELECT COUNT(b.bid) FROM boats b</string>
+		<string>SELECT s.sname, s.sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid)
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid</string>
+		<string>SELECT s.sname, sid
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid)
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid</string>
+		<string>SELECT s.sname
+FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid)
+					FROM sailors s JOIN reserves r ON s.sid = r.sid
+ 					GROUP BY s.sid
+ 				  ) sr ON s.sid = sr.sid</string>
+		<string>SELECT * FROM sailors s, reserves r where s.sid = r.sid ORDER BY s.sid</string>
+		<string>DELETE FROM reserves WHERE bid = 102 AND sid = 31 AND day = "2004-11-11"</string>
+		<string>DELETE FROM reserves WHERE bid = 102, sid = 31, day = "2004-11-11"</string>
+		<string>/* Count unique boats a sailor reserved */
+SELECT s.sid, COUNT(DISTINCT r.bid)
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+GROUP BY s.sid</string>
+		<string>/* Count unique boats a sailor reserved */
+SELECT s.sid, COUNT(r.bid)
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+GROUP BY s.sid</string>
+		<string>SELECT * FROM sailors s, reserves r where s.sid = r.sid</string>
+		<string>INSERT INTO reserves (sid, bid, day) VALUES(31, 102, "2004-11-11")</string>
+		<string>/* List boats a sailor reserved */
+SELECT s.sid, r.bid
+FROM sailors s JOIN reserves r ON s.sid = r.sid
+GROUP BY s.sid</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
