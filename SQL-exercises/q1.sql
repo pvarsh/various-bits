@@ -119,4 +119,22 @@ FROM sailors s JOIN ( SELECT s.sid, COUNT(DISTINCT r.bid) AS cnt
 WHERE sr.cnt = (SELECT COUNT(b.bid) as numboats FROM boats b)
 ;
 
-/*------ 7. Find the names of sailors who have reserved all boats called BigBoat ------ */
+/*------ 7. Find the names of sailors who have reserved all boats called Interlake ------ */
+/* Idea: select sailors whose count of boats named "Interlake" is the same as the total count of boats named "Interlake" */
+
+SELECT * FROM boats b, sailors s, reserves r WHERE b.bid = r.bid AND r.sid = s.sid;
+
+
+/* Boat IDs for name Interlake */
+SELECT b.bid FROM boats b WHERE b.bname LIKE "Interlake";
+
+/* Answer */
+SELECT * FROM 
+	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
+	FROM sailors s, reserves r, boats b
+	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
+	GROUP BY s.sid) scounts
+WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake")
+;
+
+/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
