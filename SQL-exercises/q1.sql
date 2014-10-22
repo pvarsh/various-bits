@@ -138,3 +138,8 @@ WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.
 ;
 
 /*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob');
+
+SELECT s.sid FROM sailors s WHERE s.rating > @bobmin;
+
+/*------ 9. 

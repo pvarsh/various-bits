@@ -205,9 +205,15 @@ SELECT * FROM
 WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.bname LIKE "interlake")
 ;
 
-/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/</string>
+/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob');
+
+SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin;
+
+/*------ 9. 
+</string>
 			<key>table</key>
-			<string>boats</string>
+			<string>sailors</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
@@ -222,6 +228,24 @@ WHERE scounts.boatcount = (SELECT COUNT(DISTINCT b2.bid) FROM boats b2 WHERE b2.
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>SELECT s.sid FROM sailors s WHERE s.rating &gt; @bobmin</string>
+		<string>SELECT s.sid, s.sname, s.rating FROM sailors s WHERE s.rating &gt; @bobmin</string>
+		<string>SELECT s.sid, s.sname FROM sailors s WHERE s.rating &gt; @bobmin</string>
+		<string>SELECT @bobmin</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SET @bobmin = (SELECT MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SET @bobmin = (SELECT s.sname, MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob')</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SELECT s.sname, MIN(s.rating) as mrating FROM sailors s WHERE s.sname LIKE 'bob'</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SELECT s.sname, MIN(s.rating) mrating FROM sailors s WHERE s.sname LIKE 'bob'</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SELECT s.sname, MIN(s.rating) FROM sailors s WHERE s.sname LIKE 'bob'</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SELECT s.sname, s.rating FROM sailors s WHERE s.sname LIKE 'bob'</string>
+		<string>/*------ 8. Find the IDs of sailors whose rating is better than some sailor called Bob ------*/
+SELECT s.sname, s.rating FROM sailors WHERE s.sname LIKE 'bob'</string>
 		<string>/* Answer */
 SELECT * FROM 
 	(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
@@ -265,49 +289,6 @@ WHERE scounts.boatcount = (SELECT COUNT(DISTINCT bid) FROM boats WHERE bname LIK
 	WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
 	GROUP BY s.sid) scounts
 WHERE scounts.boatcount = SELECT COUNT(DISTINCT bid) FROM boats WHERE bname LIKE "interlake"</string>
-		<string>SELECT * FROM 
-(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-GROUP BY s.sid) scounts</string>
-		<string>SELECT 
-(SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-GROUP BY s.sid) scounts</string>
-		<string>SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake' AND boatcount = 2
-GROUP BY s.sid</string>
-		<string>SELECT s.sname, COUNT(DISTINCT b.bid) AS boatcount
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-GROUP BY s.sid
-HAVING s.name like "Dustin"</string>
-		<string>SELECT s.sname, COUNT(DISTINCT b.bid)
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-GROUP BY s.sid</string>
-		<string>SELECT s.sname, b.bid
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'
-GROUP BY s.sid</string>
-		<string>SELECT s.sname, b.bid
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'</string>
-		<string>SELECT s.sname, COUNT(b.bid)
-FROM sailors s, reserves r, boats b
-WHERE s.sid = r.sid AND r.bid = b.bid AND b.bname LIKE 'interlake'</string>
-		<string>/*------ 7. Find the names of sailors who have reserved all boats called Interlake ------ */
-/* Idea: select sailors whose count of boats named "Interlake" is the same as the total count of boats named "Interlake" */
-
-SELECT * FROM boats b, sailors s, reserves r WHERE b.bid = r.bid AND r.sid = s.sid</string>
-		<string>/* Boat IDs for name Interlake */
-SELECT b.bid FROM boats b WHERE b.bname LIKE "Interlake"</string>
-		<string>SELECT s.sname, COUNT(DISTINCT b.bid)
-FROM sailors s JOIN reserves r ON s.sid = r.sid
-JOIN boats b ON r.bid = b.bid
-WHERE b.bname LIKE 'interlake'</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
