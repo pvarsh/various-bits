@@ -1,3 +1,4 @@
 *.swp
 *-checkpoint.ipynb
 */shps390/*
+/pydata/*
